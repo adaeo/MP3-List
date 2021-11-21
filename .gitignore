@@ -1,0 +1,12 @@
+# Ignore vscode directories
+.vscode/
+
+# Ignore __pycache__ directories
+__pycache__/
+
+# Ignore testing directories
+testing/
+
+# Ignore spreadhseet types
+*.tsv
+*.csv

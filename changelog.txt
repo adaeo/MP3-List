@@ -1,0 +1,4 @@
+21/11/2021
+Basic commands added.
+Verifies file and directory. File is stored in pandas DF, list of audio files in directory is built.
+Additional opt flags added.
