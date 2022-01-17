@@ -1,5 +1,5 @@
 # This is a module responsible for storing utility functions, dictionaries and other variables
-import settings as s
+import settings
 
 # Functions 
 def help_msg():
@@ -8,9 +8,9 @@ def help_msg():
     print("\t-etc.\n")
 
 def skip_row():
-    s.skip = 1
+    settings.skip = 1
 
-# Dictionary containing dtf extensions for sep arg in pandas.read_csv
+# Dictionary containing dtf extensions for separator arg in pandas.read_csv
 sepdict = {
     "csv": ', ',
     "tsv": '\t',

@@ -1,11 +1,10 @@
 ## Import Modules ## 
-import pandas as pd
+import pandas as pd 
+import eyed3
 import sys, glob, os
 
-import settings as s
+import settings
 from utility import optdict, audio_ext, sepdict
-
-
 
 ## Define Classes ##
 
@@ -18,7 +17,15 @@ class ListFile:
 
 ## Define Functions ##
 
-# Function run when program is called through terminal
+# Extract audio metadata and store it in a pandas dataframe
+def get_audio_data(audio_files):
+    # CODE TESTING #
+    # Check eyeD3 docs for more #
+    print(audio_files)
+    ae = eyed3.load("{}/01. Lily.mp3".format(settings.dir_PATH))
+    print(ae.tag.album)
+
+# Initial function run when program is called through terminal
 def initial():
     arg_length = len(sys.argv)
 
@@ -57,7 +64,7 @@ def initial():
 
         try:
             # Try load DTF into Pandas Dataframe
-            dtf_df = pd.read_csv(dtf_arg, header=None, sep=sepdict[dtf.ext], skiprows=s.skip)
+            dtf_df = pd.read_csv(dtf_arg, header=None, sep=sepdict[dtf.ext], skiprows=settings.skip)
         except FileNotFoundError:
             # Stop program if file does not exist
             error_msg = "File \"{0}\" does not exist!".format(dtf_arg)
@@ -65,13 +72,16 @@ def initial():
         
         try: 
             # Try locate Directory 
-            os.chdir(dir_arg)
+            settings.dir_PATH = os.path.abspath(dir_arg) # Set global absolute PATH for directory
+            os.chdir(dir_arg) # Change directory
             audio_files = []
             for files in audio_ext:
-                audio_files.extend(glob.glob(files))
-            
+                # Appends all files to audio_files array that match *.ext_type from utility.audio_ext
+                audio_files.extend(glob.glob(files)) 
+
+            # If any audio files are appended, run get_audio_data function
             if bool(audio_files):
-                pass
+                get_audio_data(audio_files)
             else:
                 error_msg = "No suitable audio files found in directory."
                 raise SystemExit(error_msg)
@@ -85,6 +95,7 @@ def initial():
         print("\nAt least two arguments required!")
         print("Required:\n- Delimeted-Text File: \"PATH\\file.ext\"")
         print("- Audio Directory: \"PATH\\dir\"\n")
+        print(" Use -h for help with optional flags. \n")
         raise SystemExit
 
 # Process

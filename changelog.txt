@@ -2,3 +2,8 @@
 Basic commands added.
 Verifies file and directory. File is stored in pandas DF, list of audio files in directory is built.
 Additional opt flags added.
+
+17/01/2022
+More comments added.
+Added eyeD3 library for audio file metadata.
+Added additional global variable dir_PATH.
