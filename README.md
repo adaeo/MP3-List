@@ -2,7 +2,7 @@
 Compare a list containing song details and compare with a directory of audio files using metadata.
 
 # Supported list types
-CSV, TSV
+CSV, TSV, PSV
 
 # Usage
 ## Parameters
