@@ -63,7 +63,7 @@ def evaluate_df(dtf_df, a_df, ext):
             if dtf_ans.lower() == 'y':
                 # Output missing entries to DTF file of original file type
                 dif_dtf_df.to_csv('missing.{}'.format(ext), sep=sepdict[ext])
-            print("missing.{} was saved to {}".format(ext, settings.dir_PATH))   
+                print("missing.{} was saved to {}".format(ext, settings.dir_PATH))   
 
         # Find difference between initial a_df and new int_df
         dif_a_df = pd.concat([a_df, int_df]).drop_duplicates(subset=['title', 'artist'], keep=False)
