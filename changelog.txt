@@ -7,3 +7,11 @@ Additional opt flags added.
 More comments added.
 Added eyeD3 library for audio file metadata.
 Added additional global variable dir_PATH.
+
+25/01/2021
+All audio files with extension type .mp3 or .wav in provided directory are scanned for title and artist using eyeD3 library and
+this data is stored in a pandas dataframe along with file name.
+Program now compares DTF file and audio directory to locate files with matching title and artist metadata tags.
+Progress is displayed when analysing audio files.
+Unmatched entries within DTF file can be output as separate DTF file.
+Audio files not matched to DTF file can be output in a separate DTF file.

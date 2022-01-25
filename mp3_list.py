@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ## Import Modules ## 
 import pandas as pd 
 import eyed3
@@ -17,16 +19,75 @@ class ListFile:
 
 ## Define Functions ##
 
-# Extract audio metadata and store it in a pandas dataframe
+# Extract audio metadata and return it in a pandas dataframe
 def get_audio_data(audio_files):
-    # CODE TESTING #
-    # Check eyeD3 docs for more #
-    print(audio_files)
-    ae = eyed3.load("{}/01. Lily.mp3".format(settings.dir_PATH))
-    print(ae.tag.album)
+
+    try:
+        audio_df = pd.DataFrame(columns=['title', 'artist', 'file'])
+
+        total = len(audio_files)
+        iteration = 0
+        sys.stdout.write("Audio files parsed: 0/{}".format(total))
+
+        for file in audio_files:
+            # Load audio file using absolute path and eyeD3
+            a_file = eyed3.load("{path}/{file}".format(
+                path = settings.dir_PATH, file = file))
+            audio_df = audio_df.append(
+                {'title':a_file.tag.title, 'artist':a_file.tag.artist, 'file':file}, ignore_index=True)
+            # Update progress
+            iteration += 1
+            sys.stdout.write('\r')
+            sys.stdout.write("Audio files parsed: {}/{}".format(iteration, total))
+        
+        print('\nComplete!')
+        return audio_df
+
+    except:
+         print("Something went wrong: get_audio_data()")
+
+# Evaluate dataframes and produce outputs
+def evaluate_df(dtf_df, a_df, ext):
+    try: 
+        # Find intersection on both title and artist fields
+        int_df = pd.merge(dtf_df, a_df, how='inner', on=['title','artist'])
+        # Find difference between initial dtf_df and new int_df
+        dif_dtf_df = pd.concat([dtf_df, int_df]).drop_duplicates(subset=['title', 'artist'], keep=False)
+        
+        # Compare DTF file and locate missing audio files
+        if dif_dtf_df.shape[0] == 0: # If no missing entries
+            print("All audio files in DTF were found.")
+        else: # If missing entries exist
+            print("{}/{} audio files were missing from DTF.".format(dif_dtf_df.shape[0], dtf_df.shape[0]))
+            dtf_ans = input("Print missing audio files to DTF file? y/n\n")
+            if dtf_ans.lower() == 'y':
+                # Output missing entries to DTF file of original file type
+                dif_dtf_df.to_csv('missing.{}'.format(ext), sep=sepdict[ext])
+            print("missing.{} was saved to {}".format(ext, settings.dir_PATH))   
+
+        # Find difference between initial a_df and new int_df
+        dif_a_df = pd.concat([a_df, int_df]).drop_duplicates(subset=['title', 'artist'], keep=False)
+        # Identify audio files not present in DTF file
+        if dif_a_df.shape[0] == 0: # If no non-matching audio files
+            print("No audio files were found that did not match an entry in DTF.")
+        else:
+            print("{} audio files were found that did not match any entry in DTF".format(dif_a_df.shape[0]))
+            a_ans = input("Print unmatched audio files to DTF file? y/n\n")
+            if a_ans.lower() == 'y':
+                # Output extra audio files to DTF file of original file type
+                dif_a_df.to_csv('extra.{}'.format(ext), sep=sepdict[ext])
+                print("extra.{} was saved to {}".format(ext, settings.dir_PATH)) 
+    except:
+        print("Something went wrong: evaluate_df()")
+
+    # ! Last edit here ! #
 
 # Initial function run when program is called through terminal
 def initial():
+
+    # Clean up warnings
+    eyed3.log.setLevel("ERROR")
+
     arg_length = len(sys.argv)
 
     # Print Help
@@ -65,6 +126,7 @@ def initial():
         try:
             # Try load DTF into Pandas Dataframe
             dtf_df = pd.read_csv(dtf_arg, header=None, sep=sepdict[dtf.ext], skiprows=settings.skip)
+            dtf_df = dtf_df.rename(columns={0:"title", 1:"artist"})
         except FileNotFoundError:
             # Stop program if file does not exist
             error_msg = "File \"{0}\" does not exist!".format(dtf_arg)
@@ -81,11 +143,15 @@ def initial():
 
             # If any audio files are appended, run get_audio_data function
             if bool(audio_files):
-                get_audio_data(audio_files)
+                audio_df = get_audio_data(audio_files)
             else:
                 error_msg = "No suitable audio files found in directory."
                 raise SystemExit(error_msg)
                 # Stop if directory is invalid
+            
+            # Run evaluation function on both dataframes
+            evaluate_df(dtf_df, audio_df, dtf.ext)
+
         except FileNotFoundError:
             error_msg = "Directory \"{0}\" does not exist!".format(dir_arg)
             raise SystemExit(error_msg)
