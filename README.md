@@ -1,5 +1,3 @@
-### This project is no longer being updated as of 07/03/2022
-
 # MP3-List
 Compare a delimited-text file containing song details with a directory of audio files using metadata obtained using eyeD3 module. Optionally, output missing entries and/or unmatched audio files in DTF files.
 
